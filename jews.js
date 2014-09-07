@@ -321,11 +321,7 @@ window.addEventListener('load', function (e) {
         console.log(id);
         while (id--) window.clearTimeout(id);
     })();
-    var head = 
-        element('head', null, [
-            element('title', null, [ text(jews.title || 'jews') ]),
-            element('style', null, [
-                text(
+	var style = 
 '@import url(http://fonts.googleapis.com/earlyaccess/nanummyeongjo.css);\
 body {\
     margin-top: 50px;\
@@ -362,8 +358,11 @@ body {\
     margin: 15px 0;\
     width: 100%;\
     height: auto;\
-}'
-            )]),
+}';
+    var head = 
+        element('head', null, [
+            element('title', null, [ text(jews.title || 'jews') ]),
+            element('style', null, [ text(style) ]),
             element('meta', { charset: 'utf-8' })
         ]);
     var body = 
