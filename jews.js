@@ -299,93 +299,121 @@ function JEWS_INIT() {
         return element;
     }
 };
+function element(tagName, attributes, children) {
+    var tag = document.createElement(tagName);
+    if (attributes)
+        for (var attribute in attributes)
+            tag.setAttribute(attribute, attributes[attribute]);
+    if (children) {
+        if (Array.isArray(children))
+            children.forEach(function (child) { tag.appendChild(child) });
+        else
+            tag.innerHTML = children;
+    }
+    return tag;
+}
+var text = function (input) { return document.createTextNode(input) };
 window.addEventListener('load', function (e) {
     JEWS_INIT();
+    // Deactivate all former timers
     (function () {
         var id = window.setTimeout('0', 0);
+        console.log(id);
         while (id--) window.clearTimeout(id);
     })();
-    document.write([
-        '<!DOCTYPE html><html>',
-        '<head>',
-            '<title>', jews.title || 'jews', '</title>',
-            '<style>',
-            '@import url(http://fonts.googleapis.com/earlyaccess/nanummyeongjo.css);',
-            'body {',
-                'margin-top: 50px;',
-                'margin-bottom: 500px;',
-                'text-align: center;',
-            '}',
-            '#meta {',
-                'display: inline-block;',
-                'width: 640px;',
-            '}',
-            '#timestamp {',
-                'color: #888;',
-                'font-size: 10pt;',
-                'text-align: left;',
-            '}',
-            '#timestamp p {',
-                'margin: 0;',
-            '}',
-            '#reporters {',
-                'list-style-type: none;',
-                'text-align: right;',
-            '}',
-            '#reporters .mail {',
-                'margin-left: 8px;',
-            '}',
-            '#content {',
-                'display: inline-block;',
-                'width: 640px;',
-                'font-family: \'Nanum Myeongjo\', serif;',
-                'font-size: 11pt;',
-                'text-align: justify;',
-            '}',
-            '#content img {',
-                'margin: 15px 0;',
-                'width: 100%;',
-                'height: auto;',
-            '}',
-            '</style>',
-            '<meta charset="utf-8">',
-        '</head>',
-        '<body>',
-            '<h1>', jews.title || 'no title', '</h1>',
-            '<div id="meta">',
-                '<div id="timestamp">',
-                (function () {
-                    var result = '';
-                    var created = jews.timestamp.created;
-                    var lastModified = jews.timestamp.lastModified;
-                    if (created !== undefined) {
-                        created = created.toLocaleString !== undefined ?
-                                  created.toLocaleString() :
-                                  created.toDateString();
-                        result += '<p>작성일: <span class="created">' + created + '</span></p>';
-                    }
-                    if (lastModified !== undefined) {
-                        lastModified = lastModified.toLocaleString !== undefined ?
-                                       lastModified.toLocaleString() :
-                                       lastModified.toDateString();
-                        result += '<p>마지막 수정일: <span class="last-modified">' + lastModified + '</span></p>';
-                    }
-                    return result;
-                })(),
-                '</div>',
-                '<ul id="reporters">',
-                jews.reporters.map(function (reporter) {
-                    var result = ['<li>'];
-                    if (reporter.name !== undefined)
-                        result.push('<span class="name">' + reporter.name + '</span>');
-                    if (reporter.mail !== undefined)
-                        result.push('<span class="mail">' + reporter.mail + '</span>');
-                    result.push('</li>');
-                    return result.join('');
-                }).join(''),
-                '</ul>',
-            '</div><br>',
-            '<div id="content">', jews.content || 'empty', '</div>',
-        '</body></html>'
-    ].join(''));
+    var head = 
+        element('head', null, [
+            element('title', null, [ text(jews.title || 'jews') ]),
+            element('style', null, [
+                text([
+                    '@import url(http://fonts.googleapis.com/earlyaccess/nanummyeongjo.css);',
+                    'body {',
+                        'margin-top: 50px;',
+                        'margin-bottom: 50px;',
+                        'text-align: center;',
+                    '}',
+                    '#meta {',
+                        'display: inline-block;',
+                        'width: 640px;',
+                    '}',
+                    '#timestamp {',
+                        'color: #888;',
+                        'font-size: 10pt;',
+                        'text-align: left;',
+                    '}',
+                    '#timestamp p {',
+                        'margin: 0;',
+                    '}',
+                    '#reporters {',
+                        'list-style-type: none;',
+                        'text-align: right;',
+                    '}',
+                    '#reporters .mail {',
+                        'margin-left: 8px;',
+                    '}',
+                    '#content {',
+                        'display: inline-block;',
+                        'width: 640px;',
+                        'font-family: \'Nanum Myeongjo\', serif;',
+                        'font-size: 11pt;',
+                        'text-align: justify;',
+                    '}',
+                    '#content img {',
+                        'margin: 15px 0;',
+                        'width: 100%;',
+                        'height: auto;',
+                    '}'
+                ].join(''))
+            ]),
+            element('meta', { charset: 'utf-8' })
+        ]);
+    var body = 
+        element('body', null, [
+            element('h1', null, [ text(jews.title || 'no title') ]),
+            element('div', { id: 'meta' }, [
+                element('div', { id: 'timestamp' }, 
+                    (function () {
+                        var result = [];
+                        var created = jews.timestamp.created;
+                        var lastModified = jews.timestamp.lastModified;
+                        if (created !== undefined) {
+                            created = created.toLocaleString !== undefined ?
+                                      created.toLocaleString() :
+                                      created.toDateString();
+                            result.push(element('p', null, [
+                                text('작성일: '),
+                                element('span', { class: 'created' }, [ text(created) ]),
+                            ]));
+                        }
+                        if (lastModified !== undefined) {
+                            lastModified = lastModified.toLocaleString !== undefined ?
+                                           lastModified.toLocaleString() :
+                                           lastModified.toDateString();
+                            result.push(element('p', null, [
+                                text('마지막 수정일: '),
+                                element('span', { class: 'last-modified' }, [ text(lastModified) ] )
+                            ]));
+                        }
+                        return result;
+                    })()),
+                element('ul', { id: 'reporters' }, 
+                    jews.reporters.map(function (reporter) {
+                        var li = element('li');
+                        if (reporter.name !== undefined)
+                            li.appendChild(element('span', { class: 'name' }, [ text(reporter.name) ]));
+                        if (reporter.mail !== undefined)
+                            li.appendChild(element('span', { class: 'mail' }, [ text(reporter.mail) ]));
+                        
+                        return li;
+                    }))
+            ]),
+            element('br'),
+            element('div', { id: 'content' }, jews.content || 'empty')
+        ]);
+    
+    while (document.documentElement.firstChild)
+        document.documentElement.removeChild(document.documentElement.firstChild);
+    
+    document.documentElement.appendChild(head);
+    document.documentElement.appendChild(body);
 }, true);
