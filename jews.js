@@ -325,46 +325,45 @@ window.addEventListener('load', function (e) {
         element('head', null, [
             element('title', null, [ text(jews.title || 'jews') ]),
             element('style', null, [
-                text([
-                    '@import url(http://fonts.googleapis.com/earlyaccess/nanummyeongjo.css);',
-                    'body {',
-                        'margin-top: 50px;',
-                        'margin-bottom: 50px;',
-                        'text-align: center;',
-                    '}',
-                    '#meta {',
-                        'display: inline-block;',
-                        'width: 640px;',
-                    '}',
-                    '#timestamp {',
-                        'color: #888;',
-                        'font-size: 10pt;',
-                        'text-align: left;',
-                    '}',
-                    '#timestamp p {',
-                        'margin: 0;',
-                    '}',
-                    '#reporters {',
-                        'list-style-type: none;',
-                        'text-align: right;',
-                    '}',
-                    '#reporters .mail {',
-                        'margin-left: 8px;',
-                    '}',
-                    '#content {',
-                        'display: inline-block;',
-                        'width: 640px;',
-                        'font-family: \'Nanum Myeongjo\', serif;',
-                        'font-size: 11pt;',
-                        'text-align: justify;',
-                    '}',
-                    '#content img {',
-                        'margin: 15px 0;',
-                        'width: 100%;',
-                        'height: auto;',
-                    '}'
-                ].join(''))
-            ]),
+                text(
+'@import url(http://fonts.googleapis.com/earlyaccess/nanummyeongjo.css);\
+body {\
+    margin-top: 50px;\
+    margin-bottom: 50px;\
+    text-align: center;\
+}\
+#meta {\
+    display: inline-block;\
+    width: 640px;\
+}\
+#timestamp {\
+    color: #888;\
+    font-size: 10pt;\
+    text-align: left;\
+}\
+#timestamp p {\
+    margin: 0;\
+}\
+#reporters {\
+    list-style-type: none;\
+    text-align: right;\
+}\
+#reporters .mail {\
+    margin-left: 8px;\
+}\
+#content {\
+    display: inline-block;\
+    width: 640px;\
+    font-family: \'Nanum Myeongjo\', serif;\
+    font-size: 11pt;\
+    text-align: justify;\
+}\
+#content img {\
+    margin: 15px 0;\
+    width: 100%;\
+    height: auto;\
+}'
+            )]),
             element('meta', { charset: 'utf-8' })
         ]);
     var body = 
