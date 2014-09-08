@@ -33,8 +33,19 @@ var Clarimine;
     }
     Clarimine.clearStyles = clearStyles;
 
+    var embedded = document.createElement('iframe');
+    embedded.sandbox.value = "allow-same-origin allow-scripts";
+    embedded.style.position = "fixed";
+    embedded.style.border = '0';
+    embedded.style.backgroundColor = 'white';
+    embedded.style.top = embedded.style.left = '0';
+    embedded.style.width = embedded.style.height = '100%';
+
+    document.body.style.overflow = 'hidden';
+    document.body.appendChild(embedded);
+
     function element(tagName, attributes, children) {
-        var tag = document.createElement(tagName);
+        var tag = embedded.contentDocument.createElement(tagName);
         if (attributes)
             for (var attribute in attributes)
                 tag.setAttribute(attribute, attributes[attribute]);
@@ -49,7 +60,7 @@ var Clarimine;
         return tag;
     }
     function text(input) {
-        return document.createTextNode(input);
+        return embedded.contentDocument.createTextNode(input);
     }
     ;
 
@@ -172,11 +183,8 @@ body {\
             element('div', { id: 'content' }, antibody.content || 'empty')
         ]);
 
-        while (document.documentElement.firstChild)
-            document.documentElement.removeChild(document.documentElement.firstChild);
-
-        document.documentElement.appendChild(head);
-        document.documentElement.appendChild(body);
+        embedded.contentDocument.head.appendChild(head);
+        embedded.contentDocument.body.appendChild(body);
     }, true);
 })(Clarimine || (Clarimine = {}));
 var Clarimine;

@@ -47,10 +47,21 @@ module Clarimine {
         return element;
     }
 
+    var embedded = document.createElement('iframe');
+    embedded.sandbox.value = "allow-same-origin allow-scripts";
+    embedded.style.position = "fixed";
+    embedded.style.border = '0';
+    embedded.style.backgroundColor = 'white';
+    embedded.style.top = embedded.style.left = '0';
+    embedded.style.width = embedded.style.height = '100%';
+    
+    document.body.style.overflow = 'hidden';
+    document.body.appendChild(embedded);
+
     function element(tagName: string, attributes?: { [key: string]: string }, children?: Node[]): HTMLElement
     function element(tagName: string, attributes?: { [key: string]: string }, children?: string): HTMLElement
     function element(tagName: string, attributes?: { [key: string]: string }, children?: any) {
-        var tag = document.createElement(tagName);
+        var tag = embedded.contentDocument.createElement(tagName);
         if (attributes)
             for (var attribute in attributes)
                 tag.setAttribute(attribute, attributes[attribute]);
@@ -62,14 +73,14 @@ module Clarimine {
         }
         return tag;
     }
-    function text(input: string) { return document.createTextNode(input) };
+    function text(input: string) { return embedded.contentDocument.createTextNode(input) };
 
     function collide(): Antibody {
         switch (window.location.hostname) {
             case 'news.kbs.co.kr': return Collision.kbs();
             case 'world.kbs.co.kr': return Collision.kbsWorld();
             case 'imnews.imbc.com': return Collision.mbc();
-            case 'mbn.mk.co.kr': 
+            case 'mbn.mk.co.kr':
             case 'www.mbn.co.kr': return Collision.mbn();
             case 'osen.mt.co.kr': return Collision.osen();
             case 'news.khan.co.kr': return Collision.khan();
@@ -175,11 +186,8 @@ body {\
                 element('div', { id: 'content' }, antibody.content || 'empty')
             ]);
 
-        while (document.documentElement.firstChild)
-            document.documentElement.removeChild(document.documentElement.firstChild);
-
-        document.documentElement.appendChild(head);
-        document.documentElement.appendChild(body);
+        embedded.contentDocument.head.appendChild(head);
+        embedded.contentDocument.body.appendChild(body);
     }, true);
 
 }
