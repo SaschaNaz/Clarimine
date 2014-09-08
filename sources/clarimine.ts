@@ -17,6 +17,8 @@
 // @grant none
 // ==/UserScript==
 
+if (Clarimine)
+    throw new Error("Clarimine is already loaded.");
 module Clarimine {
     export interface Antibody {
         title: string;

@@ -16,6 +16,8 @@
 // @copyright 2014 JongChan Choi, 2014 SaschaNaz
 // @grant none
 // ==/UserScript==
+if (Clarimine)
+    throw new Error("Clarimine is already loaded.");
 var Clarimine;
 (function (Clarimine) {
     function clearStyles(element) {
