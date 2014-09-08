@@ -1,4 +1,22 @@
-﻿var Clarimine;
+﻿// ==UserScript==
+// @name Clarimine
+// @namespace http://0xABCDEF.com/jews
+// @description Clarify the news page. Forked from jews
+// @include http://news.kbs.co.kr/news/NewsView.do*
+// @include http://world.kbs.co.kr/*/news/news_*_detail.htm*
+// @include http://imnews.imbc.com/*
+// @include http://mbn.mk.co.kr/pages/news/newsView.php*
+// @include http://www.mbn.co.kr/pages/news/newsView.php*
+// @include http://osen.mt.co.kr/article/*
+// @include http://news.khan.co.kr/kh_news/khan_art_view.html*
+// @include http://www.mediatoday.co.kr/news/articleView.html*
+// @include http://kr.wsj.com/posts/*
+// @include http://biz.chosun.com/site/data/html_dir/*
+// @include http://www.zdnet.co.kr/news/news_view.asp*
+// @copyright 2014 JongChan Choi, 2014 SaschaNaz
+// @grant none
+// ==/UserScript==
+var Clarimine;
 (function (Clarimine) {
     function clearStyles(element) {
         Array.prototype.forEach.call(element.querySelectorAll('*[style]'), function (child) {
@@ -451,10 +469,21 @@ var Clarimine;
             return {
                 title: $('#wrap_container_new .sub_tit_area h2').text(),
                 content: Clarimine.clearStyles($('#content')[0].cloneNode(true)).innerHTML,
-                timestamp: {
-                    created: undefined,
-                    lastModified: undefined
-                },
+                timestamp: (function () {
+                    var time = $('#wrap_container_new .sub_tit_area .sub_data').text().split('/');
+                    var date = new Date(time[0].replace(/\./g, '/'));
+                    var times = /([AP]M)\s*(\d\d):(\d\d)/i.exec(time[1]);
+                    var hh = parseInt(times[2]);
+                    var mm = parseInt(times[3]);
+                    if (time[1].toUpperCase() === 'PM')
+                        hh += 12;
+                    date.setHours(hh);
+                    date.setMinutes(mm);
+                    return {
+                        created: date,
+                        lastModified: undefined
+                    };
+                })(),
                 reporters: (function () {
                     var reporterInfoString = $('#wrap_container_new .sub_tit_area').children().eq(2).text().trim();
                     var mail = /[.a-zA-Z0-9]+@[.a-zA-Z0-9]+/.exec(reporterInfoString);
@@ -469,4 +498,3 @@ var Clarimine;
     })(Clarimine.Collision || (Clarimine.Collision = {}));
     var Collision = Clarimine.Collision;
 })(Clarimine || (Clarimine = {}));
-//# sourceMappingURL=clarimine.user.js.map

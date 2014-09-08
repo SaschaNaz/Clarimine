@@ -1,4 +1,23 @@
-﻿module Clarimine {
+﻿// ==UserScript==
+// @name Clarimine
+// @namespace http://0xABCDEF.com/jews
+// @description Clarify the news page. Forked from jews
+// @include http://news.kbs.co.kr/news/NewsView.do*
+// @include http://world.kbs.co.kr/*/news/news_*_detail.htm*
+// @include http://imnews.imbc.com/*
+// @include http://mbn.mk.co.kr/pages/news/newsView.php*
+// @include http://www.mbn.co.kr/pages/news/newsView.php*
+// @include http://osen.mt.co.kr/article/*
+// @include http://news.khan.co.kr/kh_news/khan_art_view.html*
+// @include http://www.mediatoday.co.kr/news/articleView.html*
+// @include http://kr.wsj.com/posts/*
+// @include http://biz.chosun.com/site/data/html_dir/*
+// @include http://www.zdnet.co.kr/news/news_view.asp*
+// @copyright 2014 JongChan Choi, 2014 SaschaNaz
+// @grant none
+// ==/UserScript==
+
+module Clarimine {
     export interface Antibody {
         title: string;
         content: string;
