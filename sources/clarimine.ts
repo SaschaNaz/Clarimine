@@ -47,16 +47,9 @@ module Clarimine {
         return element;
     }
 
-    var embedded = document.createElement('iframe');
-    embedded.sandbox.value = "allow-same-origin allow-scripts";
-    embedded.style.position = "fixed";
-    embedded.style.border = '0';
-    embedded.style.backgroundColor = 'white';
-    embedded.style.top = embedded.style.left = '0';
-    embedded.style.width = embedded.style.height = '100%';
-    
-    document.body.style.overflow = 'hidden';
-    document.body.appendChild(embedded);
+    var embedded: HTMLIFrameElement;
+    //embedded.style.zIndex = '2147483647';
+    //document.body.style.overflow = 'hidden';
 
     function element(tagName: string, attributes?: { [key: string]: string }, children?: Node[]): HTMLElement
     function element(tagName: string, attributes?: { [key: string]: string }, children?: string): HTMLElement
@@ -100,8 +93,20 @@ module Clarimine {
             console.log(id);
             while (id--) window.clearTimeout(id);
         })();
-        var style =
-'@import url(http://fonts.googleapis.com/earlyaccess/nanummyeongjo.css);\
+
+        document.documentElement.removeChild(document.body);
+        document.documentElement.appendChild(document.createElement('body'));
+        embedded = document.createElement('iframe');
+        embedded.sandbox.value = "allow-same-origin allow-scripts";
+        embedded.style.position = "fixed";
+        embedded.style.border = '0';
+        embedded.style.backgroundColor = 'white';
+        embedded.style.top = embedded.style.left = '0';
+        embedded.style.width = embedded.style.height = '100%';
+
+        embedded.onload = () => {
+            var style = '\
+@import url(http://fonts.googleapis.com/earlyaccess/nanummyeongjo.css);\
 body {\
     margin-top: 50px;\
     margin-bottom: 50px;\
@@ -138,56 +143,57 @@ body {\
     width: 100%;\
     height: auto;\
 }';
-        var head =
-            element('head', null, [
-                element('title', null, [text(antibody.title || 'jews')]),
-                element('style', null, [text(style)]),
-                element('meta', { charset: 'utf-8' })
-            ]);
-        var body =
-            element('body', null, [
-                element('h1', null, [text(antibody.title || 'no title')]),
-                element('div', { id: 'meta' }, [
-                    element('div', { id: 'timestamp' },
-                        (function () {
-                            var result = [];
-                            var created = antibody.timestamp.created;
-                            var lastModified = antibody.timestamp.lastModified;
-                            if (created !== undefined) {
-                                result.push(element('p', null, [
-                                    text('작성일: '),
-                                    element('span', { class: 'created' }, [
-                                        text(created.toLocaleString ? created.toLocaleString() : created.toDateString())
-                                    ]),
-                                ]));
-                            }
-                            if (lastModified !== undefined) {
-                                result.push(element('p', null, [
-                                    text('마지막 수정일: '),
-                                    element('span', { class: 'last-modified' }, [
-                                        text(lastModified.toLocaleString ? lastModified.toLocaleString() : lastModified.toDateString())
-                                    ])
-                                ]));
-                            }
-                            return result;
-                        })()),
-                    element('ul', { id: 'reporters' },
-                        antibody.reporters.map(function (reporter) {
-                            var li = element('li');
-                            if (reporter.name !== undefined)
-                                li.appendChild(element('span', { class: 'name' }, [text(reporter.name)]));
-                            if (reporter.mail !== undefined)
-                                li.appendChild(element('span', { class: 'mail' }, [text(reporter.mail)]));
+            var head =
+                element('head', null, [
+                    element('title', null, [text(antibody.title || 'jews')]),
+                    element('style', null, [text(style)]),
+                    element('meta', { charset: 'utf-8' })
+                ]);
+            var body =
+                element('body', null, [
+                    element('h1', null, [text(antibody.title || 'no title')]),
+                    element('div', { id: 'meta' }, [
+                        element('div', { id: 'timestamp' },
+                            (function () {
+                                var result = [];
+                                var created = antibody.timestamp.created;
+                                var lastModified = antibody.timestamp.lastModified;
+                                if (created !== undefined) {
+                                    result.push(element('p', null, [
+                                        text('작성일: '),
+                                        element('span', { class: 'created' }, [
+                                            text(created.toLocaleString ? created.toLocaleString() : created.toDateString())
+                                        ]),
+                                    ]));
+                                }
+                                if (lastModified !== undefined) {
+                                    result.push(element('p', null, [
+                                        text('마지막 수정일: '),
+                                        element('span', { class: 'last-modified' }, [
+                                            text(lastModified.toLocaleString ? lastModified.toLocaleString() : lastModified.toDateString())
+                                        ])
+                                    ]));
+                                }
+                                return result;
+                            })()),
+                        element('ul', { id: 'reporters' },
+                            antibody.reporters.map(function (reporter) {
+                                var li = element('li');
+                                if (reporter.name !== undefined)
+                                    li.appendChild(element('span', { class: 'name' }, [text(reporter.name)]));
+                                if (reporter.mail !== undefined)
+                                    li.appendChild(element('span', { class: 'mail' }, [text(reporter.mail)]));
 
-                            return li;
-                        }))
-                ]),
-                element('br'),
-                element('div', { id: 'content' }, antibody.content || 'empty')
-            ]);
+                                return li;
+                            }))
+                    ]),
+                    element('br'),
+                    element('div', { id: 'content' }, antibody.content || 'empty')
+                ]);
 
-        embedded.contentDocument.head.appendChild(head);
-        embedded.contentDocument.body.appendChild(body);
+            embedded.contentDocument.head.appendChild(head);
+            embedded.contentDocument.body.appendChild(body);
+        };
+        document.body.appendChild(embedded);
     }, true);
-
 }
