@@ -30,6 +30,7 @@
     <TypeScriptCompile Include="sources\types\osen.ts" />
     <TypeScriptCompile Include="sources\types\wsjkr.ts" />
     <TypeScriptCompile Include="sources\types\zdnetkr.ts" />
+    <TypeScriptCompile Include="sources\ui.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="web.config" />

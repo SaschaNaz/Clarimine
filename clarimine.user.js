@@ -33,30 +33,6 @@ var Clarimine;
     }
     Clarimine.clearStyles = clearStyles;
 
-    var embedded;
-
-    
-
-    function element(tagName, properties, children) {
-        var tag = embedded.contentDocument.createElement(tagName);
-        if (properties)
-            for (var property in properties)
-                tag[property] = properties[property];
-        if (children) {
-            if (Array.isArray(children))
-                children.forEach(function (child) {
-                    tag.appendChild(child);
-                });
-            else
-                tag.innerHTML = children;
-        }
-        return tag;
-    }
-    function text(input) {
-        return embedded.contentDocument.createTextNode(input);
-    }
-    ;
-
     function collide() {
         switch (window.location.hostname) {
             case 'news.kbs.co.kr':
@@ -96,111 +72,24 @@ var Clarimine;
                 window.clearTimeout(id);
         })();
 
-        var backup = document.body;
+        Clarimine.backup = document.body;
         document.documentElement.removeChild(document.body);
         document.documentElement.appendChild(document.createElement('body'));
 
-        var rollback = function () {
-            document.documentElement.removeChild(document.body);
-            document.documentElement.appendChild(backup);
+        Clarimine.embedded = document.createElement('iframe');
+        Clarimine.embedded.sandbox.value = "allow-same-origin allow-scripts";
+        Clarimine.embedded.style.position = "fixed";
+        Clarimine.embedded.style.border = '0';
+        Clarimine.embedded.style.backgroundColor = 'white';
+        Clarimine.embedded.style.top = Clarimine.embedded.style.left = '0';
+        Clarimine.embedded.style.width = Clarimine.embedded.style.height = '100%';
+
+        Clarimine.embedded.onload = function () {
+            var reaction = Clarimine.react(antibody);
+            Clarimine.embedded.contentDocument.head.appendChild(reaction.head);
+            Clarimine.embedded.contentDocument.body.appendChild(reaction.body);
         };
-
-        embedded = document.createElement('iframe');
-        embedded.sandbox.value = "allow-same-origin allow-scripts";
-        embedded.style.position = "fixed";
-        embedded.style.border = '0';
-        embedded.style.backgroundColor = 'white';
-        embedded.style.top = embedded.style.left = '0';
-        embedded.style.width = embedded.style.height = '100%';
-
-        embedded.onload = function () {
-            var style = '\
-@import url(http://fonts.googleapis.com/earlyaccess/nanummyeongjo.css);\
-body {\
-    margin-top: 50px;\
-    margin-bottom: 50px;\
-    text-align: center;\
-}\
-#meta {\
-    display: inline-block;\
-    width: 640px;\
-}\
-#timestamp {\
-    color: #888;\
-    font-size: 10pt;\
-    text-align: left;\
-}\
-#timestamp p {\
-    margin: 0;\
-}\
-#reporters {\
-    list-style-type: none;\
-    text-align: right;\
-}\
-#reporters .mail {\
-    margin-left: 8px;\
-}\
-#content {\
-    display: inline-block;\
-    width: 640px;\
-    font-family: \'Nanum Myeongjo\', serif;\
-    font-size: 11pt;\
-    text-align: justify;\
-}\
-#content img {\
-    margin: 15px 0;\
-    width: 100%;\
-    height: auto;\
-}';
-            var head = element('head', null, [
-                element('title', null, [text(antibody.title || 'jews')]),
-                element('style', null, [text(style)]),
-                element('meta', { charset: 'utf-8' })
-            ]);
-            var body = element('body', null, [
-                element('h1', null, [text(antibody.title || 'no title')]),
-                element('div', { id: 'meta' }, [
-                    element('div', { id: 'timestamp' }, (function () {
-                        var result = [];
-                        var created = antibody.timestamp.created;
-                        var lastModified = antibody.timestamp.lastModified;
-                        if (created !== undefined) {
-                            result.push(element('p', null, [
-                                text('작성일: '),
-                                element('span', { className: 'created' }, [
-                                    text(created.toLocaleString ? created.toLocaleString() : created.toDateString())
-                                ])
-                            ]));
-                        }
-                        if (lastModified !== undefined) {
-                            result.push(element('p', null, [
-                                text('마지막 수정일: '),
-                                element('span', { className: 'last-modified' }, [
-                                    text(lastModified.toLocaleString ? lastModified.toLocaleString() : lastModified.toDateString())
-                                ])
-                            ]));
-                        }
-                        return result;
-                    })()),
-                    element('ul', { id: 'reporters' }, antibody.reporters.map(function (reporter) {
-                        var li = element('li');
-                        if (reporter.name !== undefined)
-                            li.appendChild(element('span', { className: 'name' }, [text(reporter.name)]));
-                        if (reporter.mail !== undefined)
-                            li.appendChild(element('span', { className: 'mail' }, [text(reporter.mail)]));
-
-                        return li;
-                    }))
-                ]),
-                element('br'),
-                element('div', { id: 'content' }, antibody.content || 'empty'),
-                element('div', null, [element('a', { onclick: rollback }, [text('원본 보기')])])
-            ]);
-
-            embedded.contentDocument.head.appendChild(head);
-            embedded.contentDocument.body.appendChild(body);
-        };
-        document.body.appendChild(embedded);
+        document.body.appendChild(Clarimine.embedded);
     }, true);
 })(Clarimine || (Clarimine = {}));
 var Clarimine;
@@ -523,4 +412,122 @@ var Clarimine;
         Collision.zdnetKr = zdnetKr;
     })(Clarimine.Collision || (Clarimine.Collision = {}));
     var Collision = Clarimine.Collision;
+})(Clarimine || (Clarimine = {}));
+var Clarimine;
+(function (Clarimine) {
+    Clarimine.embedded;
+    Clarimine.backup;
+
+    function element(tagName, properties, children) {
+        var tag = Clarimine.embedded.contentDocument.createElement(tagName);
+        if (properties)
+            for (var property in properties)
+                tag[property] = properties[property];
+        if (children) {
+            if (Array.isArray(children))
+                children.forEach(function (child) {
+                    tag.appendChild(child);
+                });
+            else
+                tag.innerHTML = children;
+        }
+        return tag;
+    }
+    function text(input) {
+        return Clarimine.embedded.contentDocument.createTextNode(input);
+    }
+    ;
+
+    function react(antibody) {
+        var rollback = function () {
+            document.documentElement.removeChild(document.body);
+            document.documentElement.appendChild(Clarimine.backup);
+        };
+
+        var style = '\
+@import url(http://fonts.googleapis.com/earlyaccess/nanummyeongjo.css);\
+body {\
+    margin-top: 50px;\
+    margin-bottom: 50px;\
+    text-align: center;\
+}\
+#meta {\
+    display: inline-block;\
+    width: 640px;\
+}\
+#timestamp {\
+    color: #888;\
+    font-size: 10pt;\
+    text-align: left;\
+}\
+#timestamp p {\
+    margin: 0;\
+}\
+#reporters {\
+    list-style-type: none;\
+    text-align: right;\
+}\
+#reporters .mail {\
+    margin-left: 8px;\
+}\
+#content {\
+    display: inline-block;\
+    width: 640px;\
+    font-family: \'Nanum Myeongjo\', serif;\
+    font-size: 11pt;\
+    text-align: justify;\
+}\
+#content img {\
+    margin: 15px 0;\
+    width: 100%;\
+    height: auto;\
+}';
+        return {
+            head: element('head', null, [
+                element('title', null, [text(antibody.title || 'jews')]),
+                element('style', null, [text(style)]),
+                element('meta', { charset: 'utf-8' })
+            ]),
+            body: element('body', null, [
+                element('h1', null, [text(antibody.title || 'no title')]),
+                element('div', { id: 'meta' }, [
+                    element('div', { id: 'timestamp' }, (function () {
+                        var result = [];
+                        var created = antibody.timestamp.created;
+                        var lastModified = antibody.timestamp.lastModified;
+                        if (created !== undefined) {
+                            result.push(element('p', null, [
+                                text('작성일: '),
+                                element('span', { className: 'created' }, [
+                                    text(created.toLocaleString ? created.toLocaleString() : created.toDateString())
+                                ])
+                            ]));
+                        }
+                        if (lastModified !== undefined) {
+                            result.push(element('p', null, [
+                                text('마지막 수정일: '),
+                                element('span', { className: 'last-modified' }, [
+                                    text(lastModified.toLocaleString ? lastModified.toLocaleString() : lastModified.toDateString())
+                                ])
+                            ]));
+                        }
+                        return result;
+                    })()),
+                    element('ul', { id: 'reporters' }, antibody.reporters.map(function (reporter) {
+                        var li = element('li');
+                        if (reporter.name !== undefined)
+                            li.appendChild(element('span', { className: 'name' }, [text(reporter.name)]));
+                        if (reporter.mail !== undefined)
+                            li.appendChild(element('span', { className: 'mail' }, [text(reporter.mail)]));
+
+                        return li;
+                    }))
+                ]),
+                element('br'),
+                element('div', { id: 'content' }, antibody.content || 'empty'),
+                element('div', null, [element('a', { onclick: rollback }, [text('원본 보기')])])
+            ])
+        };
+    }
+    Clarimine.react = react;
 })(Clarimine || (Clarimine = {}));
