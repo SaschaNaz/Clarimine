@@ -73,11 +73,11 @@ module Clarimine {
             while (id--) window.clearTimeout(id);
         })();
 
-        backup = <HTMLBodyElement>document.body;
+        UI.backup = <HTMLBodyElement>document.body;
         document.documentElement.removeChild(document.body);
         document.documentElement.appendChild(document.createElement('body'));
 
-        embedded = document.createElement('iframe');
+        var embedded = UI.embedded = document.createElement('iframe');
         embedded.sandbox.value = "allow-same-origin allow-scripts";
         embedded.style.position = "fixed";
         embedded.style.border = '0';
@@ -86,7 +86,7 @@ module Clarimine {
         embedded.style.width = embedded.style.height = '100%';
 
         embedded.onload = () => {
-            var reaction = react(antibody);
+            var reaction = UI.react(antibody);
             embedded.contentDocument.head.appendChild(reaction.head);
             embedded.contentDocument.body.appendChild(reaction.body);
         };

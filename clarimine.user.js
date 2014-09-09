@@ -72,24 +72,24 @@ var Clarimine;
                 window.clearTimeout(id);
         })();
 
-        Clarimine.backup = document.body;
+        Clarimine.UI.backup = document.body;
         document.documentElement.removeChild(document.body);
         document.documentElement.appendChild(document.createElement('body'));
 
-        Clarimine.embedded = document.createElement('iframe');
-        Clarimine.embedded.sandbox.value = "allow-same-origin allow-scripts";
-        Clarimine.embedded.style.position = "fixed";
-        Clarimine.embedded.style.border = '0';
-        Clarimine.embedded.style.backgroundColor = 'white';
-        Clarimine.embedded.style.top = Clarimine.embedded.style.left = '0';
-        Clarimine.embedded.style.width = Clarimine.embedded.style.height = '100%';
+        var embedded = Clarimine.UI.embedded = document.createElement('iframe');
+        embedded.sandbox.value = "allow-same-origin allow-scripts";
+        embedded.style.position = "fixed";
+        embedded.style.border = '0';
+        embedded.style.backgroundColor = 'white';
+        embedded.style.top = embedded.style.left = '0';
+        embedded.style.width = embedded.style.height = '100%';
 
-        Clarimine.embedded.onload = function () {
-            var reaction = Clarimine.react(antibody);
-            Clarimine.embedded.contentDocument.head.appendChild(reaction.head);
-            Clarimine.embedded.contentDocument.body.appendChild(reaction.body);
+        embedded.onload = function () {
+            var reaction = Clarimine.UI.react(antibody);
+            embedded.contentDocument.head.appendChild(reaction.head);
+            embedded.contentDocument.body.appendChild(reaction.body);
         };
-        document.body.appendChild(Clarimine.embedded);
+        document.body.appendChild(embedded);
     }, true);
 })(Clarimine || (Clarimine = {}));
 var Clarimine;
@@ -415,36 +415,8 @@ var Clarimine;
 })(Clarimine || (Clarimine = {}));
 var Clarimine;
 (function (Clarimine) {
-    Clarimine.embedded;
-    Clarimine.backup;
-
-    function element(tagName, properties, children) {
-        var tag = Clarimine.embedded.contentDocument.createElement(tagName);
-        if (properties)
-            for (var property in properties)
-                tag[property] = properties[property];
-        if (children) {
-            if (Array.isArray(children))
-                children.forEach(function (child) {
-                    tag.appendChild(child);
-                });
-            else
-                tag.innerHTML = children;
-        }
-        return tag;
-    }
-    function text(input) {
-        return Clarimine.embedded.contentDocument.createTextNode(input);
-    }
-    ;
-
-    function react(antibody) {
-        var rollback = function () {
-            document.documentElement.removeChild(document.body);
-            document.documentElement.appendChild(Clarimine.backup);
-        };
-
-        var style = '\
+    (function (UI) {
+        UI.style = '\
 @import url(http://fonts.googleapis.com/earlyaccess/nanummyeongjo.css);\
 body {\
     margin-top: 50px;\
@@ -481,53 +453,96 @@ body {\
     margin: 15px 0;\
     width: 100%;\
     height: auto;\
+}\
+#rollback {\
+    display: inline-block;\
+    margin-top: 50px;\
+    width: 640px;\
+    text-align: right;\
 }';
-        return {
-            head: element('head', null, [
-                element('title', null, [text(antibody.title || 'jews')]),
-                element('style', null, [text(style)]),
-                element('meta', { charset: 'utf-8' })
-            ]),
-            body: element('body', null, [
-                element('h1', null, [text(antibody.title || 'no title')]),
-                element('div', { id: 'meta' }, [
-                    element('div', { id: 'timestamp' }, (function () {
-                        var result = [];
-                        var created = antibody.timestamp.created;
-                        var lastModified = antibody.timestamp.lastModified;
-                        if (created !== undefined) {
-                            result.push(element('p', null, [
-                                text('작성일: '),
-                                element('span', { className: 'created' }, [
-                                    text(created.toLocaleString ? created.toLocaleString() : created.toDateString())
-                                ])
-                            ]));
-                        }
-                        if (lastModified !== undefined) {
-                            result.push(element('p', null, [
-                                text('마지막 수정일: '),
-                                element('span', { className: 'last-modified' }, [
-                                    text(lastModified.toLocaleString ? lastModified.toLocaleString() : lastModified.toDateString())
-                                ])
-                            ]));
-                        }
-                        return result;
-                    })()),
-                    element('ul', { id: 'reporters' }, antibody.reporters.map(function (reporter) {
-                        var li = element('li');
-                        if (reporter.name !== undefined)
-                            li.appendChild(element('span', { className: 'name' }, [text(reporter.name)]));
-                        if (reporter.mail !== undefined)
-                            li.appendChild(element('span', { className: 'mail' }, [text(reporter.mail)]));
+    })(Clarimine.UI || (Clarimine.UI = {}));
+    var UI = Clarimine.UI;
+})(Clarimine || (Clarimine = {}));
+var Clarimine;
+(function (Clarimine) {
+    (function (UI) {
+        UI.embedded;
+        UI.backup;
 
-                        return li;
-                    }))
+        function element(tagName, properties, children) {
+            var tag = UI.embedded.contentDocument.createElement(tagName);
+            if (properties)
+                for (var property in properties)
+                    tag[property] = properties[property];
+            if (children) {
+                if (Array.isArray(children))
+                    children.forEach(function (child) {
+                        tag.appendChild(child);
+                    });
+                else
+                    tag.innerHTML = children;
+            }
+            return tag;
+        }
+        function text(input) {
+            return UI.embedded.contentDocument.createTextNode(input);
+        }
+        ;
+
+        function react(antibody) {
+            var rollback = function () {
+                document.documentElement.removeChild(document.body);
+                document.documentElement.appendChild(UI.backup);
+            };
+
+            return {
+                head: element('head', null, [
+                    element('title', null, [text(antibody.title || 'jews')]),
+                    element('style', null, [text(UI.style)]),
+                    element('meta', { charset: 'utf-8' })
                 ]),
-                element('br'),
-                element('div', { id: 'content' }, antibody.content || 'empty'),
-                element('div', null, [element('a', { onclick: rollback }, [text('원본 보기')])])
-            ])
-        };
-    }
-    Clarimine.react = react;
+                body: element('body', null, [
+                    element('h1', null, [text(antibody.title || 'no title')]),
+                    element('div', { id: 'meta' }, [
+                        element('div', { id: 'timestamp' }, (function () {
+                            var result = [];
+                            var created = antibody.timestamp.created;
+                            var lastModified = antibody.timestamp.lastModified;
+                            if (created !== undefined) {
+                                result.push(element('p', null, [
+                                    text('작성일: '),
+                                    element('span', { className: 'created' }, [
+                                        text(created.toLocaleString ? created.toLocaleString() : created.toDateString())
+                                    ])
+                                ]));
+                            }
+                            if (lastModified !== undefined) {
+                                result.push(element('p', null, [
+                                    text('마지막 수정일: '),
+                                    element('span', { className: 'last-modified' }, [
+                                        text(lastModified.toLocaleString ? lastModified.toLocaleString() : lastModified.toDateString())
+                                    ])
+                                ]));
+                            }
+                            return result;
+                        })()),
+                        element('ul', { id: 'reporters' }, antibody.reporters.map(function (reporter) {
+                            var li = element('li');
+                            if (reporter.name !== undefined)
+                                li.appendChild(element('span', { className: 'name' }, [text(reporter.name)]));
+                            if (reporter.mail !== undefined)
+                                li.appendChild(element('span', { className: 'mail' }, [text(reporter.mail)]));
+
+                            return li;
+                        }))
+                    ]),
+                    element('br'),
+                    element('div', { id: 'content' }, antibody.content || 'empty'),
+                    element('div', { id: 'rollback' }, [element('a', { onclick: rollback, href: '#' }, [text('원본 보기')])])
+                ])
+            };
+        }
+        UI.react = react;
+    })(Clarimine.UI || (Clarimine.UI = {}));
+    var UI = Clarimine.UI;
 })(Clarimine || (Clarimine = {}));
