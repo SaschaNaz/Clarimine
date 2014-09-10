@@ -92,6 +92,29 @@ var Clarimine;
         document.body.appendChild(embedded);
     }, true);
 })(Clarimine || (Clarimine = {}));
+var ArrayExtensions;
+(function (ArrayExtensions) {
+    function from(arrayLike, mapFn, thisArg) {
+        var array = [];
+        var push;
+        if (!mapFn)
+            push = function (item, index) {
+                return array.push(item);
+            };
+        else if (thisArg === undefined)
+            push = function (item, index) {
+                return array.push(mapFn(item, index));
+            };
+        else
+            push = function (item, index) {
+                return array.push(mapFn.call(thisArg, item, index));
+            };
+        for (var i = 0; i < arrayLike.length; i++)
+            push(arrayLike[i], i);
+        return array;
+    }
+    ArrayExtensions.from = from;
+})(ArrayExtensions || (ArrayExtensions = {}));
 var Clarimine;
 (function (Clarimine) {
     (function (Collision) {
@@ -137,10 +160,10 @@ var Clarimine;
     (function (Collision) {
         function kbs() {
             return {
-                title: $('#GoContent .news_title .tit').text(),
-                content: Clarimine.clearStyles($('#content')[0].cloneNode(true)).innerHTML,
+                title: document.querySelector('#GoContent .news_title .tit').textContent,
+                content: Clarimine.clearStyles(document.querySelector('#content').cloneNode(true)).innerHTML,
                 timestamp: (function () {
-                    var parsedData = $('#GoContent .news_title .time li').contents();
+                    var parsedData = document.querySelectorAll('#GoContent .news_title .time li');
                     function parseTime(time) {
                         var times = time.split('(');
                         var date = new Date(time[0].replace(/\./, '/'));
@@ -150,17 +173,19 @@ var Clarimine;
                         return date;
                     }
                     return {
-                        created: parseTime(parsedData.eq(1).text()),
-                        lastModified: parseTime(parsedData.eq(3).text())
+                        created: parseTime(parsedData[0].childNodes[1].textContent),
+                        lastModified: parseTime(parsedData[1].childNodes[1].textContent)
                     };
                 })(),
                 reporters: (function () {
-                    return $('#ulReporterList .reporterArea').toArray().map(function (reporterArea) {
-                        var mail = $('.reporter_mail img[alt=이메일]', reporterArea).closest('a').attr('href');
+                    return ArrayExtensions.from(document.querySelectorAll('#ulReporterList .reporterArea')).map(function (reporterArea) {
+                        var mail = ArrayExtensions.from(reporterArea.querySelectorAll('.reporter_mail a')).filter(function (a) {
+                            return !!a.querySelector('img[alt=이메일]');
+                        })[0].href;
                         if (mail !== undefined)
-                            mail = /'.*','(.*)'/.exec(mail)[1];
+                            mail = /'.*','(.*)'/.exec(mail)[1].trim();
                         return {
-                            name: $('.reporter_name', reporterArea).contents().eq(0).text().trim(),
+                            name: reporterArea.querySelector('.reporter_name').childNodes[0].textContent.trim(),
                             mail: mail
                         };
                     });
@@ -176,16 +201,16 @@ var Clarimine;
     (function (Collision) {
         function kbsWorld() {
             return {
-                title: document.getElementById('content_area').getElementsByClassName('title')[0].getElementsByTagName('h2')[0].textContent,
+                title: document.querySelector('#content_area .title h2').textContent,
                 content: (function () {
-                    var photo = document.getElementById('container').getElementsByClassName('photo')[0];
+                    var photo = document.querySelector('#container .photo');
                     var content = document.getElementById('content').cloneNode(true);
                     if (photo !== undefined)
                         content.insertBefore(photo.getElementsByTagName('img')[0], content.firstChild);
                     return Clarimine.clearStyles(content).innerHTML;
                 })(),
                 timestamp: (function () {
-                    var parsedData = document.getElementById('content_area').getElementsByClassName('title')[0].getElementsByTagName('em');
+                    var parsedData = document.querySelectorAll('#content_area .title em');
                     return {
                         created: new Date(parsedData[0].textContent.replace(/-/g, '/')),
                         lastModified: new Date(parsedData[1].textContent.replace(/-/g, '/'))

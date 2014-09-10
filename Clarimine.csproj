@@ -18,6 +18,7 @@
     <IISExpressUseClassicPipelineMode />
   </PropertyGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="sources\submodules\array.ts" />
     <TypeScriptCompile Include="sources\clarimine.ts" />
     <TypeScriptCompile Include="sources\jquery.d.ts" />
     <TypeScriptCompile Include="sources\types\chosunbiz.ts" />
@@ -31,7 +32,7 @@
     <TypeScriptCompile Include="sources\types\wsjkr.ts" />
     <TypeScriptCompile Include="sources\types\zdnetkr.ts" />
     <TypeScriptCompile Include="sources\ui\css.ts" />
-	<TypeScriptCompile Include="sources\ui\dom.ts" />
+    <TypeScriptCompile Include="sources\ui\dom.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="web.config" />

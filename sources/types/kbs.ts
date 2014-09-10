@@ -1,10 +1,10 @@
 ﻿module Clarimine.Collision {
     export function kbs(): Antibody {
         return {
-            title: $('#GoContent .news_title .tit').text(),
-            content: clearStyles(<HTMLElement>$('#content')[0].cloneNode(true)).innerHTML,
+            title: document.querySelector('#GoContent .news_title .tit').textContent,
+            content: clearStyles(<HTMLElement>document.querySelector('#content').cloneNode(true)).innerHTML,
             timestamp: (() => {
-                var parsedData = $('#GoContent .news_title .time li').contents();
+                var parsedData = document.querySelectorAll('#GoContent .news_title .time li');
                 function parseTime(time: string) {
                     var times = time.split('(');
                     var date = new Date(time[0].replace(/\./, '/'));
@@ -14,17 +14,17 @@
                     return date;
                 }
                 return {
-                    created: parseTime(parsedData.eq(1).text()),
-                    lastModified: parseTime(parsedData.eq(3).text())
+                    created: parseTime(parsedData[0].childNodes[1].textContent),
+                    lastModified: parseTime(parsedData[1].childNodes[1].textContent)
                 };
             })(),
             reporters: (() => {
-                return $('#ulReporterList .reporterArea').toArray().map((reporterArea) => {
-                    var mail = $('.reporter_mail img[alt=이메일]', reporterArea).closest('a').attr('href');
+                return ArrayExtensions.from(document.querySelectorAll('#ulReporterList .reporterArea')).map((reporterArea: Element) => {
+                    var mail = (<HTMLAnchorElement>ArrayExtensions.from(reporterArea.querySelectorAll('.reporter_mail a')).filter((a: Element) => !!a.querySelector('img[alt=이메일]'))[0]).href;
                     if (mail !== undefined)
-                        mail = /'.*','(.*)'/.exec(mail)[1];
+                        mail = /'.*','(.*)'/.exec(mail)[1].trim();
                     return {
-                        name: $('.reporter_name', reporterArea).contents().eq(0).text().trim(),
+                        name: reporterArea.querySelector('.reporter_name').childNodes[0].textContent.trim(),
                         mail: mail
                     };
                 });
