@@ -262,14 +262,14 @@ var Clarimine;
     (function (Collision) {
         function mbc() {
             return {
-                title: $('#content .view-title').text(),
-                content: Clarimine.clearStyles($('#DivPrint .view-con')[0].cloneNode(true)).innerHTML,
+                title: document.querySelector('#content .view-title').textContent,
+                content: Clarimine.clearStyles(document.querySelector('#DivPrint .view-con').cloneNode(true)).innerHTML,
                 timestamp: {
-                    created: new Date($('#DivPrint .article-time-date').text()),
+                    created: new Date(document.querySelector('#DivPrint .article-time-date').textContent),
                     lastModified: undefined
                 },
                 reporters: [{
-                        name: $('#DivPrint .reporter').text().trim().split(/\s+/)[0],
+                        name: document.querySelector('#DivPrint .reporter').textContent.trim().split(/\s+/)[0],
                         mail: undefined
                     }]
             };
@@ -283,14 +283,16 @@ var Clarimine;
     (function (Collision) {
         function mbn() {
             return {
-                title: $('#article_title .title_n').contents().eq(0).text().trim(),
+                title: document.querySelector('#article_title .title_n').childNodes[0].textContent.trim(),
                 content: (function () {
-                    var content = $('#newsViewArea')[0].cloneNode(true);
-                    $('*[id*=google]', content).remove();
+                    var content = document.querySelector('#newsViewArea').cloneNode(true);
+                    ArrayExtensions.from(content.querySelectorAll('*[id*=google]')).forEach(function (el) {
+                        return el.parentNode.removeChild(el);
+                    });
                     return Clarimine.clearStyles(content).innerHTML;
                 })(),
                 timestamp: {
-                    created: new Date($('#article_title .reg_dt').text().replace('기사입력', '')),
+                    created: new Date(document.querySelector('#article_title .reg_dt').textContent.replace('기사입력', '')),
                     lastModified: undefined
                 },
                 reporters: []
@@ -335,26 +337,36 @@ var Clarimine;
     (function (Collision) {
         function osen() {
             return {
-                title: $('#container .detailTitle .obj').text().trim(),
+                title: document.querySelector('#container .detailTitle .obj').textContent.trim(),
                 content: (function () {
-                    var content = $('#_article')[0].cloneNode(true);
-                    $('iframe, #divBox, #scrollDiv, div[class^=tabArea], .mask_div, .articleList', content).remove();
-                    $('a', content).each(function (_, anchor) {
-                        $(anchor).replaceWith($(anchor).contents());
+                    var content = document.getElementById('_article').cloneNode(true);
+
+                    // Remove these elements
+                    ArrayExtensions.from(content.querySelectorAll('iframe, #divBox, #scrollDiv, div[class^=tabArea], .mask_div, .articleList')).forEach(function (el) {
+                        return el.parentNode.removeChild(el);
+                    });
+
+                    // Replace these elements with their children
+                    ArrayExtensions.from(content.getElementsByTagName('a')).forEach(function (a) {
+                        ArrayExtensions.from(a.childNodes).forEach(function (child) {
+                            a.removeChild(child);
+                            a.parentNode.insertBefore(child, a);
+                        });
+                        a.parentNode.removeChild(a);
                     });
                     return Clarimine.clearStyles(content).innerHTML;
                 })(),
                 timestamp: {
-                    created: new Date(/\d{4}.\d\d.\d\d\s+\d\d:\d\d/.exec($('#container .writer').text())[0]),
+                    created: new Date(/\d{4}.\d\d.\d\d\s+\d\d:\d\d/.exec(document.querySelector('#container .writer').textContent)[0]),
                     lastModified: undefined
                 },
                 reporters: (function () {
-                    var mail = $('#container .detailLink a[href^=mailto]');
+                    var mail = document.querySelector('#container .detailLink a[href^=mailto]');
                     var address;
-                    if (mail.length > 0)
-                        address = mail.attr('href').substr('mailto:'.length);
+                    if (mail)
+                        address = mail.href.substr('mailto:'.length);
                     return [{
-                            name: $('#container .writer').text().split(/\s+/)[1],
+                            name: document.querySelector('#container .writer').textContent.split(/\s+/)[1],
                             mail: address || undefined
                         }];
                 })()

@@ -1,14 +1,14 @@
 ﻿module Clarimine.Collision {
     export function mbc(): Antibody {
         return {
-            title: $('#content .view-title').text(),
-            content: clearStyles(<HTMLElement>$('#DivPrint .view-con')[0].cloneNode(true)).innerHTML,
+            title: document.querySelector('#content .view-title').textContent,
+            content: clearStyles(<HTMLElement>document.querySelector('#DivPrint .view-con').cloneNode(true)).innerHTML,
             timestamp: {
-                created: new Date($('#DivPrint .article-time-date').text()),
+                created: new Date(document.querySelector('#DivPrint .article-time-date').textContent),
                 lastModified: undefined
             },
             reporters: [{
-                name: $('#DivPrint .reporter').text().trim().split(/\s+/)[0],
+                name: document.querySelector('#DivPrint .reporter').textContent.trim().split(/\s+/)[0],
                 mail: undefined
             }]
         }
