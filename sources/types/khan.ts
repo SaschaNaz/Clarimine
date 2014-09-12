@@ -3,12 +3,10 @@
         return {
             title: $('#container .title_group .CR dt').text(),
             content: (() => {
-                var content = <HTMLElement>$('#sub_cntTopTxt')[0].cloneNode(true);
-                $('a', content).each(function (_, anchor) {
-                    $(anchor).replaceWith($(anchor).contents());
-                });
-                $('#article_bottom_ad, #divBox', content).remove();
-                return clearStyles(content).innerHTML;
+                var content = <HTMLElement>document.querySelector('#sub_cntTopTxt').cloneNode(true);
+                Helpers.replaceWithChildren(content.getElementsByTagName('a'));
+                Helpers.removeFromTree(content.querySelectorAll('#article_bottom_ad, #divBox'));
+                return Helpers.clearStyles(content).innerHTML;
             })(),
             timestamp: (() => {
                 var parsedData = $('#container .article_date').contents();

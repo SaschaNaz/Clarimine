@@ -2,7 +2,7 @@
     export function kbs(): Antibody {
         return {
             title: document.querySelector('#GoContent .news_title .tit').textContent,
-            content: clearStyles(<HTMLElement>document.querySelector('#content').cloneNode(true)).innerHTML,
+            content: Helpers.clearStyles(<HTMLElement>document.querySelector('#content').cloneNode(true)).innerHTML,
             timestamp: (() => {
                 var parsedData = document.querySelectorAll('#GoContent .news_title .time li');
                 function parseTime(time: string) {
@@ -20,7 +20,8 @@
             })(),
             reporters: (() => {
                 return ArrayExtensions.from(document.querySelectorAll('#ulReporterList .reporterArea')).map((reporterArea: Element) => {
-                    var mail = (<HTMLAnchorElement>ArrayExtensions.from(reporterArea.querySelectorAll('.reporter_mail a')).filter((a: Element) => !!a.querySelector('img[alt=이메일]'))[0]).href;
+                    var mail = (<HTMLAnchorElement>
+                        Helpers.has(reporterArea.querySelectorAll('.reporter_mail a'), 'img[alt=이메일]')[0]).href;
                     if (mail !== undefined)
                         mail = /'.*','(.*)'/.exec(mail)[1].trim();
                     return {

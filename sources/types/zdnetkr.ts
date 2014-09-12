@@ -2,7 +2,7 @@
     export function zdnetKr(): Antibody {
         return {
             title: $('#wrap_container_new .sub_tit_area h2').text(),
-            content: clearStyles(<HTMLElement>$('#content')[0].cloneNode(true)).innerHTML,
+            content: Helpers.clearStyles(<HTMLElement>$('#content')[0].cloneNode(true)).innerHTML,
             timestamp: (() => {
                 var time = $('#wrap_container_new .sub_tit_area .sub_data').text().split('/');
                 var date = new Date(time[0].replace(/\./g, '/'));

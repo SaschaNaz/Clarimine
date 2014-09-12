@@ -7,7 +7,7 @@
                 var content = <HTMLElement>document.getElementById('content').cloneNode(true);
                 if (photo !== undefined)
                     content.insertBefore(photo.getElementsByTagName('img')[0], content.firstChild);
-                return clearStyles(content).innerHTML;
+                return Helpers.clearStyles(content).innerHTML;
             })(),
             timestamp: (() => {
                 var parsedData = document.querySelectorAll('#content_area .title em');

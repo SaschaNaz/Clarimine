@@ -6,7 +6,7 @@
                 var content = <HTMLElement>$('.article')[0].cloneNode(true);
                 $('.promotion', content).remove();
                 $('div[class*=date_]', content).remove();
-                return clearStyles(content).innerHTML;
+                return Helpers.clearStyles(content).innerHTML;
             })(),
             timestamp: (() => {
                 var timeStr = $('#date_text')[0].innerText;

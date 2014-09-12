@@ -18,6 +18,7 @@
     <IISExpressUseClassicPipelineMode />
   </PropertyGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="sources\helpers.ts" />
     <TypeScriptCompile Include="sources\submodules\array.ts" />
     <TypeScriptCompile Include="sources\clarimine.ts" />
     <TypeScriptCompile Include="sources\jquery.d.ts" />

@@ -16,7 +16,7 @@
                             remove(arr[i]);
                 });
                 remove(<Node>article.querySelectorAll('img[src*="//cp.news.search.daum.net"]')[0]);
-                return clearStyles(article).innerHTML;
+                return Helpers.clearStyles(article).innerHTML;
             })(),
             timestamp: {
                 created: new Date($('.articleHeadlineBox .dateStamp')[0].innerText.replace(/\s*KST\s*$/, ' +0900').replace(/(\d+)\.?\s+([a-z]{3})[a-z]+\s+(\d+)\s*,\s*/i, '$1 $2 $3 ')), /* RFC 2822 */

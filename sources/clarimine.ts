@@ -35,18 +35,6 @@ module Clarimine {
         mail: string;
     }
 
-    export function clearStyles(element: HTMLElement) {
-        Array.prototype.forEach.call(element.querySelectorAll('*[style]'), function (child: Element) {
-            child.removeAttribute('style');
-        });
-        Array.prototype.forEach.call(element.querySelectorAll('img'), function (image: HTMLElement) {
-            image.removeAttribute('width');
-            image.removeAttribute('height');
-            image.removeAttribute('border');
-        });
-        return element;
-    }
-
     function collide(): Antibody {
         switch (window.location.hostname) {
             case 'news.kbs.co.kr': return Collision.kbs();

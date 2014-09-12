@@ -2,7 +2,7 @@
     export function mbc(): Antibody {
         return {
             title: document.querySelector('#content .view-title').textContent,
-            content: clearStyles(<HTMLElement>document.querySelector('#DivPrint .view-con').cloneNode(true)).innerHTML,
+            content: Helpers.clearStyles(<HTMLElement>document.querySelector('#DivPrint .view-con').cloneNode(true)).innerHTML,
             timestamp: {
                 created: new Date(document.querySelector('#DivPrint .article-time-date').textContent),
                 lastModified: undefined

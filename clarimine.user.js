@@ -20,19 +20,6 @@ if (Clarimine)
     throw new Error("Clarimine is already loaded.");
 var Clarimine;
 (function (Clarimine) {
-    function clearStyles(element) {
-        Array.prototype.forEach.call(element.querySelectorAll('*[style]'), function (child) {
-            child.removeAttribute('style');
-        });
-        Array.prototype.forEach.call(element.querySelectorAll('img'), function (image) {
-            image.removeAttribute('width');
-            image.removeAttribute('height');
-            image.removeAttribute('border');
-        });
-        return element;
-    }
-    Clarimine.clearStyles = clearStyles;
-
     function collide() {
         switch (window.location.hostname) {
             case 'news.kbs.co.kr':
@@ -92,6 +79,49 @@ var Clarimine;
         document.body.appendChild(embedded);
     }, true);
 })(Clarimine || (Clarimine = {}));
+var Clarimine;
+(function (Clarimine) {
+    (function (Helpers) {
+        function clearStyles(element) {
+            Array.prototype.forEach.call(element.querySelectorAll('*[style]'), function (child) {
+                child.removeAttribute('style');
+            });
+            Array.prototype.forEach.call(element.querySelectorAll('img'), function (image) {
+                image.removeAttribute('width');
+                image.removeAttribute('height');
+                image.removeAttribute('border');
+            });
+            return element;
+        }
+        Helpers.clearStyles = clearStyles;
+
+        function removeFromTree(nodes) {
+            ArrayExtensions.from(nodes).forEach(function (node) {
+                return node.parentNode.removeChild(node);
+            });
+        }
+        Helpers.removeFromTree = removeFromTree;
+
+        function replaceWithChildren(nodes) {
+            ArrayExtensions.from(nodes).forEach(function (node) {
+                ArrayExtensions.from(node.childNodes).forEach(function (child) {
+                    node.removeChild(child);
+                    node.parentNode.insertBefore(child, node);
+                });
+                node.parentNode.removeChild(node);
+            });
+        }
+        Helpers.replaceWithChildren = replaceWithChildren;
+
+        function has(targets, selector) {
+            return ArrayExtensions.from(targets).filter(function (el) {
+                return !!el.querySelector(selector);
+            });
+        }
+        Helpers.has = has;
+    })(Clarimine.Helpers || (Clarimine.Helpers = {}));
+    var Helpers = Clarimine.Helpers;
+})(Clarimine || (Clarimine = {}));
 var ArrayExtensions;
 (function (ArrayExtensions) {
     function from(arrayLike, mapFn, thisArg) {
@@ -125,7 +155,7 @@ var Clarimine;
                     var content = $('.article')[0].cloneNode(true);
                     $('.promotion', content).remove();
                     $('div[class*=date_]', content).remove();
-                    return Clarimine.clearStyles(content).innerHTML;
+                    return Clarimine.Helpers.clearStyles(content).innerHTML;
                 })(),
                 timestamp: (function () {
                     var timeStr = $('#date_text')[0].innerText;
@@ -161,7 +191,7 @@ var Clarimine;
         function kbs() {
             return {
                 title: document.querySelector('#GoContent .news_title .tit').textContent,
-                content: Clarimine.clearStyles(document.querySelector('#content').cloneNode(true)).innerHTML,
+                content: Clarimine.Helpers.clearStyles(document.querySelector('#content').cloneNode(true)).innerHTML,
                 timestamp: (function () {
                     var parsedData = document.querySelectorAll('#GoContent .news_title .time li');
                     function parseTime(time) {
@@ -179,9 +209,7 @@ var Clarimine;
                 })(),
                 reporters: (function () {
                     return ArrayExtensions.from(document.querySelectorAll('#ulReporterList .reporterArea')).map(function (reporterArea) {
-                        var mail = ArrayExtensions.from(reporterArea.querySelectorAll('.reporter_mail a')).filter(function (a) {
-                            return !!a.querySelector('img[alt=이메일]');
-                        })[0].href;
+                        var mail = Clarimine.Helpers.has(reporterArea.querySelectorAll('.reporter_mail a'), 'img[alt=이메일]')[0].href;
                         if (mail !== undefined)
                             mail = /'.*','(.*)'/.exec(mail)[1].trim();
                         return {
@@ -207,7 +235,7 @@ var Clarimine;
                     var content = document.getElementById('content').cloneNode(true);
                     if (photo !== undefined)
                         content.insertBefore(photo.getElementsByTagName('img')[0], content.firstChild);
-                    return Clarimine.clearStyles(content).innerHTML;
+                    return Clarimine.Helpers.clearStyles(content).innerHTML;
                 })(),
                 timestamp: (function () {
                     var parsedData = document.querySelectorAll('#content_area .title em');
@@ -230,12 +258,10 @@ var Clarimine;
             return {
                 title: $('#container .title_group .CR dt').text(),
                 content: (function () {
-                    var content = $('#sub_cntTopTxt')[0].cloneNode(true);
-                    $('a', content).each(function (_, anchor) {
-                        $(anchor).replaceWith($(anchor).contents());
-                    });
-                    $('#article_bottom_ad, #divBox', content).remove();
-                    return Clarimine.clearStyles(content).innerHTML;
+                    var content = document.querySelector('#sub_cntTopTxt').cloneNode(true);
+                    Clarimine.Helpers.replaceWithChildren(content.getElementsByTagName('a'));
+                    Clarimine.Helpers.removeFromTree(content.querySelectorAll('#article_bottom_ad, #divBox'));
+                    return Clarimine.Helpers.clearStyles(content).innerHTML;
                 })(),
                 timestamp: (function () {
                     var parsedData = $('#container .article_date').contents();
@@ -263,7 +289,7 @@ var Clarimine;
         function mbc() {
             return {
                 title: document.querySelector('#content .view-title').textContent,
-                content: Clarimine.clearStyles(document.querySelector('#DivPrint .view-con').cloneNode(true)).innerHTML,
+                content: Clarimine.Helpers.clearStyles(document.querySelector('#DivPrint .view-con').cloneNode(true)).innerHTML,
                 timestamp: {
                     created: new Date(document.querySelector('#DivPrint .article-time-date').textContent),
                     lastModified: undefined
@@ -286,10 +312,8 @@ var Clarimine;
                 title: document.querySelector('#article_title .title_n').childNodes[0].textContent.trim(),
                 content: (function () {
                     var content = document.querySelector('#newsViewArea').cloneNode(true);
-                    ArrayExtensions.from(content.querySelectorAll('*[id*=google]')).forEach(function (el) {
-                        return el.parentNode.removeChild(el);
-                    });
-                    return Clarimine.clearStyles(content).innerHTML;
+                    Clarimine.Helpers.removeFromTree(content.querySelectorAll('*[id*=google]'));
+                    return Clarimine.Helpers.clearStyles(content).innerHTML;
                 })(),
                 timestamp: {
                     created: new Date(document.querySelector('#article_title .reg_dt').textContent.replace('기사입력', '')),
@@ -307,11 +331,11 @@ var Clarimine;
     (function (Collision) {
         function mediaToday() {
             return {
-                title: $('#font_title').text().trim(),
-                content: Clarimine.clearStyles($('#media_body')[0].cloneNode(true)).innerHTML,
+                title: document.getElementById('font_title').textContent.trim(),
+                content: Clarimine.Helpers.clearStyles(document.getElementById('media_body').cloneNode(true)).innerHTML,
                 timestamp: (function () {
                     var data = {};
-                    $('#font_email').closest('td[class!="SmN"]').closest('table').find('td[align="left"] table td').text().split(/(입력|노출)\s*:([\d\-\.\s:]+)/).forEach(function (v, i, arr) {
+                    Clarimine.Helpers.has(document.getElementsByTagName('table'), 'td:not(.SmN) #font_email')[0].querySelector('td[align="left"] table td').textContent.split(/(입력|노출)\s*:([\d\-\.\s:]+)/).forEach(function (v, i, arr) {
                         if (v === '입력')
                             data.created = new Date(arr[i + 1].trim().replace(/\s+/g, ' ').replace(/[-\.]/g, '/') + '+0900');
                         else if (v === '노출')
@@ -320,7 +344,7 @@ var Clarimine;
                     return data;
                 })(),
                 reporters: (function () {
-                    var parsedData = $('#font_email').text().split('|');
+                    var parsedData = document.getElementById('font_email').textContent.split('|');
                     return [{
                             name: parsedData[0].trim(),
                             mail: parsedData[1].trim()
@@ -340,21 +364,9 @@ var Clarimine;
                 title: document.querySelector('#container .detailTitle .obj').textContent.trim(),
                 content: (function () {
                     var content = document.getElementById('_article').cloneNode(true);
-
-                    // Remove these elements
-                    ArrayExtensions.from(content.querySelectorAll('iframe, #divBox, #scrollDiv, div[class^=tabArea], .mask_div, .articleList')).forEach(function (el) {
-                        return el.parentNode.removeChild(el);
-                    });
-
-                    // Replace these elements with their children
-                    ArrayExtensions.from(content.getElementsByTagName('a')).forEach(function (a) {
-                        ArrayExtensions.from(a.childNodes).forEach(function (child) {
-                            a.removeChild(child);
-                            a.parentNode.insertBefore(child, a);
-                        });
-                        a.parentNode.removeChild(a);
-                    });
-                    return Clarimine.clearStyles(content).innerHTML;
+                    Clarimine.Helpers.removeFromTree(content.querySelectorAll('iframe, #divBox, #scrollDiv, div[class^=tabArea], .mask_div, .articleList'));
+                    Clarimine.Helpers.replaceWithChildren(content.getElementsByTagName('a'));
+                    return Clarimine.Helpers.clearStyles(content).innerHTML;
                 })(),
                 timestamp: {
                     created: new Date(/\d{4}.\d\d.\d\d\s+\d\d:\d\d/.exec(document.querySelector('#container .writer').textContent)[0]),
@@ -398,7 +410,7 @@ var Clarimine;
                                 remove(arr[i]);
                     });
                     remove(article.querySelectorAll('img[src*="//cp.news.search.daum.net"]')[0]);
-                    return Clarimine.clearStyles(article).innerHTML;
+                    return Clarimine.Helpers.clearStyles(article).innerHTML;
                 })(),
                 timestamp: {
                     created: new Date($('.articleHeadlineBox .dateStamp')[0].innerText.replace(/\s*KST\s*$/, ' +0900').replace(/(\d+)\.?\s+([a-z]{3})[a-z]+\s+(\d+)\s*,\s*/i, '$1 $2 $3 ')),
@@ -420,7 +432,7 @@ var Clarimine;
         function zdnetKr() {
             return {
                 title: $('#wrap_container_new .sub_tit_area h2').text(),
-                content: Clarimine.clearStyles($('#content')[0].cloneNode(true)).innerHTML,
+                content: Clarimine.Helpers.clearStyles($('#content')[0].cloneNode(true)).innerHTML,
                 timestamp: (function () {
                     var time = $('#wrap_container_new .sub_tit_area .sub_data').text().split('/');
                     var date = new Date(time[0].replace(/\./g, '/'));
